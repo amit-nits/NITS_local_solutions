@@ -104,7 +104,7 @@ We can solve the queries offline meaning :
 To solve over all the queries first sort the queries on the basis of K (saving the original index with them).
 for each distinct K calculate (adj^K) and the sum of each row, in complexity O(n*n*n* log2(K) + n*n). Then we can answer each query of that K in O(1) and give the answer of the original index of that query.
 
-Another approach for G,
+Another approach for G, (See Harshit15 solution)
 My solution for G uses sparse table. 
 You can learn about it here
 https://cp-algorithms.com/data_structures/sparse-table.html
