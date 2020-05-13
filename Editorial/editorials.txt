@@ -1,1 +1,111 @@
+For problem A::
 
+For any index i > 0, it will remove all elements to its left which are greater than it until a smaller element is encountered. For eg- if the array is 2 4 5 3, if we consider index 3(0 indexed), then it will remove elements at index 1 and 2. If the array is 1 3 4 2 5 6 3, index 3 will remove 1 and 2 and index 6 will remove 4 and 5. The resulting array will be 1 2 3. If you observe closely, no matter what the last element is it will always be a part of the final array (as there are no elements to it's right so it can't be removed. So we can iterate in  reverse order, let mx = a[n-1], delete all elements a[i] > mx until a element smaller (or equal) than mx is encountered. Then we update our mx to this new value and iterate further. Time complexity O(N).
+
+For problem B ::
+
+We only need to consider the values of array mod K. Since we need to maximize the number of sets, for the values that are divisible by K (a[i] % K = 0), we will use it to make good sets of size 1. For rest of the elements, we need to find pairs such that a[i] % K + a[j] % K = K. To count thism I will tell you 2 methods -
+
+1. Using map (what most of the particpants used during the contest) -
+Let's keep a map (let's name it mp) that stores the frequency of a[i] % K values in the array. Now we need to count sets of size 1 and size 2 seperately. Sets of size 1 will simple be mp[0]. For sets of size 2, we cannot iterate from 1 to K / 2 since K <= 10^9. We only need to iterate over values that are present in the array. Here is the code in C++ to do so:
+	ans = 0
+	for(auto p : mp)
+		ans += min(p.second, mp[k-p.first])
+	ans /= 2
+We divide the answer by 2 in the end because each case will be counted twice.
+
+2. Using two pointer method -
+Sort the array after taking mod K. let st = first index such that a[st] > 0 and en = n - 1.
+	ans = st //number of single element sets	
+	while st < en:
+		if a[st] + a[en] == K:
+			ans ++, st ++, en --
+		else if a[st] + a[en] < K:
+			st ++ //if the sum is less than K, we increase the smaller value i.e., a[st]
+		else
+			en -- //if the sum is greater than K, we decrease the bigger value i.e., a[en]
+Time Complexity O(nlogn)
+
+For problem C::
+
+There a total 2*N numbers written on the coin. There can be at max 4 such numbers which have count >= N/2. We can simply calculate the cost for each such number and take the minimum. Let x be such a number. Let f0[x] denote costs of the coins with x facing up and f1[x] denote costs of the coins with x facing down. To minimize the cost, we only need to flip the coins that cost minimum energy. So we sort both the vectors, f0[x] and f1[x]. Let l1 = size(f0[x]) and l2 = size(f1[x]). Now there are three cases -
+1. l1 == N/2:
+	ans = 0 //Already exactly half of the coins have this number on top
+2. l1 > N/2:
+	we need to flip l1 - N/2 number of coins with x on top. So we take sum of first l1 - N/2 values in sorted vector f0[x]
+3. l1 < N/2
+	we need to flip N/2 - l1 number of coins with x on bottom. So we take sum of first N/2 - l1 values in sorted vector f1[x]
+Time complexity O(nlogn)
+
+For problem D ::
+step 1 #  compute factors of sqrt(N). (You can precompute just like Harshit Bhaiya and Padmanabha did but it is not needed). It can be done in O(sqrt(sqrt(N))) . store them in set S.(to sort and make them unique).
+step2#  multiply set S to itself and store the multiplication in set T. My claim is "T will be the factors of N."
+Ex.  For N = 36 . factors of 6 = {1,2,3,6} multiply the set to itself and get {1,2,3,4,6,9,12,18,36}.  That is the factor set of N.
+step3# Total Red + green area will be (pi/4)* (N-1)*(N-1); (since first and the last factor is 1 and N.) So the biggest circle will have the diameter (N-1). to calculate the red area all that is needed is just a simple loop and inclusion/exclusion. Green Area can be calculated by formala (total area - Red area). (See any solution.)
+
+For problem E ,
+Dynamic Programming Approach:
+Prerequisite: basic terminology of dynamic programming.
+Step1# sort the hostels in non-decreasing order of start time.
+Step2: 
+let's define DP states -  
+	1. cur_hostel_pos or  pos
+	2. cur_time or tim
+Recursive DP transition (Psuedocode):
+def answer(pos , tim):
+	if tim > l or pos > n-1 : 
+		return 0;
+	if start time of pos > cur_time:
+		return  answer( pos , start_time_of_pos)
+	if(cur_time + cur_pos_duration > l+1) 
+		return  answer(pos+1 , time)
+	else:
+		return max( answer(pos+1 , time) , 1 + answer(pos+1 , time + cur_pos_duration))
+Basic idea is either take the cur pos hostel and increase time accordingly or call for pos+1 and same time.
+{ See solutions of invictus_123 or mine given in link}
+
+Job scheduling Approach:
+The intuition behind this is that it is always better to schedule the process which will finish first.
+Now, if we encounter a process which will finish before the current process, we pause the current process  and run the new process.
+For eg
+Let L = 14
+We have two processes
+P1 arrives at time 1 with  value 10
+P2 arrives at time 5 with. value 4.
+Now, we run P1 from time 1 to 4. Now at time instant 5, P1 has 6 days remaining and P2 has 4 days remaining. So, we pause P1 and schedule P2 from 5 to 8. And remaining 6 days of P1 again from 9 to 14.
+This can be rearranged as P1 runs from 1 to 10 and P2 runs from 11 to 14.
+
+For problem F , 
+This was quite an easy problem for F (More of a troll problem).
+Observation 1. The obvious observation is that the Problem can be divided into two different sections.
+Range query
+combinatorics
+Let's Think about 2 first.
+Observation 2. given K characters there exist only one K-key (using those character without repetition). The rest of them are equivalent to that key. (All of them are pairwise anagrams.) . Let's take the sorted one S of them as a representative of that group G.
+Ex. K = 3 , S = "aac" , G = {"aac" , "aca" , "caa" } .
+Now the problem becomes count number of sorted strings of size K that can be made by N distinct chars.(with repetition of characters).
+That is the classic Combination with repetition.(Search stars and bars on google if you don't know that.) . The solution is Comb(K+N-1 , N-1).
+Till now this is clear that the answer of query [l, r , k] is Comb(K+N-1 , N-1) if N is the number of distinct chars in s[l,r].
+
+Range query can be solved using two data structures.(No of distinct chars in a Range)
+1 . Basic Segment tree with combine operation bitwise or and No. of distinct char in [L,R] = popcount(query(L,R)) .
+2 . PBDS and for every char 'a' to 'z' check if it exists in [L,R]. 
+3 .  BIT (https://www.geeksforgeeks.org/queries-number-distinct-elements-subarray/)
+
+For problem G::
+
+It was the most unintuitive Problem in the problem set. Though there is a very fundamental concept of graph theory behind it.
+Given a Graph you have to find the probability that A path of size K starting from U will end on V. (Vertices may repeat in the path).
+It can be easily understood that the probability p = (No of paths ending at V)/ (Total number of U-K path that exist)
+This can be solved using adjacency matrix exponentiation (under a modulo) of complexity O(n*n*n* log2(K)) 
+No of paths of length K from U ending at V= (adj^K)[U][V]
+Total number of paths = sum of row (adj^K)[u].
+We can solve the queries offline meaning :
+To solve over all the queries first sort the queries on the basis of K (saving the original index with them).
+for each distinct K calculate (adj^K) and the sum of each row, in complexity O(n*n*n* log2(K) + n*n). Then we can answer each query of that K in O(1) and give the answer of the original index of that query.
+
+Another approach for G,
+My solution for G uses sparse table. 
+You can learn about it here
+https://cp-algorithms.com/data_structures/sparse-table.html
+Using sparse table + dp , you can calculate the number of ways to reach from vertex x to vertex y in 2^i steps. (It is similar to the application of sparse table to calculate LCA of two nodes using binary lifting https://cp-algorithms.com/graph/lca_binary_lifting.html). Then, K can be represented as sum powers of 2 and the value can be calculated using using the sparse table. Try solving https://codeforces.com/contest/702/problem/E this problem using sparse table first.
